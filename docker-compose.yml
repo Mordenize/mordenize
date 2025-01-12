@@ -1,0 +1,85 @@
+version: '3'
+
+services:
+    # Nginx service
+    # nginx:
+    #     build:
+    #         context: .
+    #         dockerfile: './docker/nginx/Dockerfile'
+    #     container_name: 'mordenize_nginx'
+    #     volumes:
+    #         - './app/public:/var/www/app/public'
+    #         - ./app/storage/app:/var/www/app/storage/app # need setting this to use laravel storage with nginx
+    #         - ./docker/nginx/${APP_ENV:-local}.conf:/etc/nginx/nginx.conf
+    #     networks:
+    #         - mordenize
+    #     ports:
+    #         - '9000:80'
+    #     expose:
+    #         - '80'
+    #     links:
+    #         - 'web'
+    #         - 'app'
+    #     depends_on:
+    #         - 'web'
+    #         - 'app'
+
+    # (Laravel) API application
+    app:
+        build:
+            context: .
+            dockerfile: './docker/app/Dockerfile'
+        container_name: 'mordenize_app'
+        environment:
+            TZ: '${APP_TIMEZONE:-UTC}'
+        volumes:
+            - './app:/var/www/app'
+            - './docker/app/config/php/php.ini:/usr/local/etc/php/php.ini'
+            - './docker/app/entrypoint.sh:/entrypoint.sh'
+        working_dir: '/var/www/app'
+        networks:
+            - mordenize
+        ports:
+            - '5173'
+            - '8000'
+        expose:
+            - '5173'
+            - '8000'
+        command: ['/entrypoint.sh']
+        links:
+            - 'db'
+        depends_on:
+            - 'db'
+
+    # MySQL database
+    db:
+        build:
+            context: .
+            dockerfile: './docker/db/Dockerfile'
+        container_name: 'mordenize_db'
+        volumes:
+            - 'mordenize-mysql:/var/lib/mysql'
+        networks:
+            - mordenize
+        environment:
+            TZ: '${APP_TIMEZONE:-UTC}'
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+        ports:
+            - "${FORWARD_DB_PORT:-13306:3306}"
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-p${DB_PASSWORD}']
+            interval: 10s
+            timeout: 5s
+            retries: 3
+
+networks:
+    mordenize:
+        driver: bridge
+volumes:
+    mordenize-mysql: # Use mysql local (must install mysql local to use)
+        driver: local
+    dependencies:
