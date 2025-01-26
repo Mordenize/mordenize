@@ -2,3 +2,6 @@
 /vendor
 .env
 /.vscode
+
+# Ignore temporary Husky hook files if any
+.husky/_/
