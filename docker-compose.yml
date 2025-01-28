@@ -2,29 +2,27 @@ version: '3'
 
 services:
     # Nginx service
-    # nginx:
-    #     build:
-    #         context: .
-    #         dockerfile: './docker/nginx/Dockerfile'
-    #     container_name: 'mordenize_nginx'
-    #     volumes:
-    #         - './app/public:/var/www/app/public'
-    #         - ./app/storage/app:/var/www/app/storage/app # need setting this to use laravel storage with nginx
-    #         - ./docker/nginx/${APP_ENV:-local}.conf:/etc/nginx/nginx.conf
-    #     networks:
-    #         - mordenize
-    #     ports:
-    #         - '9000:80'
-    #     expose:
-    #         - '80'
-    #     links:
-    #         - 'web'
-    #         - 'app'
-    #     depends_on:
-    #         - 'web'
-    #         - 'app'
+    nginx:
+        build:
+            context: .
+            dockerfile: './docker/nginx/Dockerfile'
+        container_name: 'mordenize_nginx'
+        volumes:
+            - './app/public:/var/www/app/public'
+            - ./app/storage/app:/var/www/app/storage/app # need setting this to use laravel storage with nginx
+            - ./docker/nginx/${APP_ENV:-local}.conf:/etc/nginx/nginx.conf
+        networks:
+            - mordenize
+        ports:
+            - '8000:80'
+        expose:
+            - '80'
+        links:
+            - 'app'
+        depends_on:
+            - 'app'
 
-    # (Laravel) API application
+    # (Laravel) Admin & API application
     app:
         build:
             context: .
@@ -39,12 +37,8 @@ services:
         working_dir: '/var/www/app'
         networks:
             - mordenize
-        ports:
-            - '5173'
-            - '8000'
         expose:
-            - '5173'
-            - '8000'
+            - '9000'
         command: ['/entrypoint.sh']
         links:
             - 'db'
