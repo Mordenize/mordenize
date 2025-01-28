@@ -4,10 +4,12 @@
 
 ## Technology  
 - Laravel 11 
+    - Use **Laravel Breeze** (It is a minimal, simple implementation of all of Laravel's authentication features, including login, registration, password reset, email verification, and password confirmation)
+        - Unit test use **Pest** framework (https://pestphp.com/)
 - Docker
 - CI/CD (Git Actions, Git hooks): 
-    + Checking commit rules by Conventional Commits
-    + Checking PHP scripts by PHPMD/PHDCS
+    - Checking commit rules by Conventional Commits
+    - Checking PHP scripts by PHPMD/PHDCS
 
 ## Database 
 ```mermaid
