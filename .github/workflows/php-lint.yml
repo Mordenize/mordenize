@@ -1,0 +1,39 @@
+name: PHP Code Quality Checks
+
+on: [push, pull_request]
+
+jobs:
+  php-lint:
+    name: Check PHPCS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:2.8.5
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+        working-directory: app
+
+      - name: Get staged files
+        id: staged-files
+        run: |
+          git diff --name-only --cached --diff-filter=d -- '*.php' > staged_files.txt
+
+      - name: Run PHPCS
+        run: |
+          if [ -s staged_files.txt ]; then
+            cat staged_files.txt | xargs vendor/bin/phpcs --standard=PSR12
+          else
+            echo "No PHP files staged for checking."
+          fi
+
+       - name: Remove staged files list
+        run: |
+          rm -f staged_files.txt
