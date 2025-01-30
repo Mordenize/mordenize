@@ -1,0 +1,3 @@
+echo "❗=== Checking ESLint"
+# Check JS, TS format was valid with ESLint rules
+sh .husky/scripts/eslint-checker.sh
