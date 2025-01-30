@@ -10,8 +10,5 @@
   },
   "scripts": {
     "prepare": "husky"
-  },
-  "lint-staged": {
-    "**/*.{js,ts}": "eslint --fix"
   }
 }

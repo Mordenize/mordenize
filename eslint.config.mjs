@@ -5,8 +5,14 @@ import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  {files: ["**/*.{js,mjs,cjs,ts}"]},
+  {files: ["**/*.{js,cjs,ts}"]},
   {languageOptions: { globals: globals.browser }},
   pluginJs.configs.recommended,
+  {
+    rules: {
+      "indent": ["error"],
+      "semi": ["error", "always"],
+    }
+  },
   ...tseslint.configs.recommended,
 ];
