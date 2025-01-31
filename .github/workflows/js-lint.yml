@@ -1,6 +1,8 @@
 name: JS/TS Code Quality Checks
 
-on: [push, pull_request]
+on: 
+  pull_request:
+    types: [opened, synchronize]
 
 jobs: 
   js-lint:
@@ -10,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to allow diff comparisons
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,17 +26,16 @@ jobs:
       - name: Get staged files
         id: staged-files
         run: |
-          echo "STAGED_FILES=$(git diff --name-only --cached --diff-filter=ACM | grep -E '\.(js|ts|tsx|jsx)$' | tr '\n' ' ')" >> $GITHUB_ENV
-
+          echo ${{ github.event_name }}
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No JS/TS files staged for checking."
+      
       - name: Run ESLint
         run: |
-          if [ -n "$STAGED_FILES" ]; then
-            npx eslint $STAGED_FILES
-          else
-            echo "No JS/TS files staged for checking."
+          if [ -s js_staged_files.txt ]; then
+            cat js_staged_files.txt | npx eslint
           fi
 
-      - name: Clean up environment variables
+      - name: Remove staged files list
         run: |
-          unset STAGED_FILES
+          rm -f js_staged_files.txt
         if: always()
