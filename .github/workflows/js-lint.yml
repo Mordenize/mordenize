@@ -1,8 +1,6 @@
 name: JS/TS Code Quality Checks
 
-on: 
-  pull_request:
-    types: [opened, synchronize]
+on: ['pull_request']
 
 jobs: 
   js-lint:
@@ -26,7 +24,6 @@ jobs:
       - name: Get staged files
         id: staged-files
         run: |
-          echo ${{ github.event_name }}
           git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No JS/TS files staged for checking."
       
       - name: Run ESLint
