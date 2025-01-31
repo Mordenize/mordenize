@@ -1,0 +1,41 @@
+name: JS/TS Code Quality Checks
+
+on: 
+  pull_request:
+    types: [opened, synchronize]
+
+jobs: 
+  js-lint:
+    name: Check ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to allow diff comparisons
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci # or yarn install
+
+      - name: Get staged files
+        id: staged-files
+        run: |
+          echo ${{ github.event_name }}
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No JS/TS files staged for checking."
+      
+      - name: Run ESLint
+        run: |
+          if [ -s js_staged_files.txt ]; then
+            cat js_staged_files.txt | npx eslint
+          fi
+
+      - name: Remove staged files list
+        run: |
+          rm -f js_staged_files.txt
+        if: always()
