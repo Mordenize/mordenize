@@ -35,5 +35,6 @@ jobs:
           fi
 
        - name: Remove staged files list
-        run: |
+         run: |
           rm -f staged_files.txt
+         if: always()
