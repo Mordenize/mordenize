@@ -5,7 +5,16 @@ exec < /dev/tty
 export FORCE_COLOR=1
 
 echo "💡=== Checking ESLint (.js,.ts,.jsx,.tsx)"
-sh .husky/workflows/eslint-checker.sh
+sh .husky/workflows/eslint-checker.sh || PRE_COMMIT_FAILED=1
 
 echo "💡=== Checking Stylelint (.css,.scss)"
-sh .husky/workflows/stylelint-checker.sh
+sh .husky/workflows/stylelint-checker.sh || PRE_COMMIT_FAILED=1
+
+echo "💡=== Checking PHPCS (.php)"
+sh .husky/workflows/phpcs-checker.sh || PRE_COMMIT_FAILED=1
+
+# If any check failed, return a non-zero status (trigger pre-commit failure)
+if [[ $PRE_COMMIT_FAILED -eq 1 ]]; then
+  echo "❌❌❌ Commit failed: One or more checks failed. Please fix the issues. ❌❌❌"
+  exit 1
+fi
