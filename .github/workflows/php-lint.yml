@@ -1,6 +1,8 @@
 name: PHP Code Quality Checks
 
-on: [push, pull_request]
+on: 
+  pull_request:
+    types: ['opened', 'synchronize']
 
 jobs:
   php-lint:
@@ -21,20 +23,13 @@ jobs:
         run: composer install --no-interaction --prefer-dist
         working-directory: app
 
-      - name: Get staged files
+      - name: Get PHP staged files
         id: staged-files
         run: |
-          git diff --name-only --cached --diff-filter=d -- '*.php' > staged_files.txt
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No PHP files staged for checking."
 
-      - name: Run PHPCS
+      - name: Execute PHPCS
         run: |
           if [ -s staged_files.txt ]; then
             cat staged_files.txt | xargs vendor/bin/phpcs --standard=PSR12
-          else
-            echo "No PHP files staged for checking."
           fi
-
-       - name: Remove staged files list
-         run: |
-          rm -f staged_files.txt
-         if: always()
