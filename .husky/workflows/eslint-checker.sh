@@ -1,16 +1,10 @@
 #!/bin/bash
-# Run the script with an interactive terminal
-exec < /dev/tty
-
-# Keep ESLint's color output in a Husky pre-commit hook 
-export FORCE_COLOR=1
-
-# Get staged JS and TS files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=d | grep -E '\.(js|ts)$' || true)
+# Get staged JS/TS files
+STAGED_FILES=$(git --no-pager diff --cached --name-only --diff-filter=AMCR | grep -E '\.(js|ts|tsx|jsx)$' || true)
 
 # Exit if no JS/TS files are staged
 if [ -z "$STAGED_FILES" ]; then
-  echo "No staged JS/TS files to lint."
+  echo "👍 No staged JS/TS files to lint."
   exit 0
 fi
 
@@ -25,7 +19,7 @@ if [ -n "$ESLINT_OUTPUT" ]; then
     echo "🛠️ Fixing ESLint issues in staged files..."
     npx eslint --fix $STAGED_FILES
 
-    echo "✅ ESLint fixes applied. Re-adding files to Git..."
+    echo "👍 ESLint fixes applied. Re-adding files to Git..."
     git add $STAGED_FILES
     echo "📌 Files re-added successfully."
   else
@@ -34,4 +28,5 @@ if [ -n "$ESLINT_OUTPUT" ]; then
   fi
 fi
 
+echo "👍 All the files are valid."
 exit 0

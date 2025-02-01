@@ -1,3 +1,11 @@
-echo "❗=== Checking ESLint"
-# Check JS, TS format was valid with ESLint rules
-sh .husky/scripts/eslint-checker.sh
+# Run the script with an interactive terminal
+exec < /dev/tty
+
+# Keep color output in a Husky pre-commit hook 
+export FORCE_COLOR=1
+
+echo "💡=== Checking ESLint (.js,.ts,.jsx,.tsx)"
+sh .husky/workflows/eslint-checker.sh
+
+echo "💡=== Checking Stylelint (.css,.scss)"
+sh .husky/workflows/stylelint-checker.sh

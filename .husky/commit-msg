@@ -1,4 +1,4 @@
-echo "❗=== Checking Conventional Commit"
+echo "💡=== Checking Conventional Commit"
 
 # Lint commit messages 
 npx --no-install commitlint --edit $1
