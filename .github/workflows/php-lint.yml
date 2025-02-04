@@ -1,6 +1,8 @@
 name: PHP Code Quality Checks
 
-on: [push, pull_request]
+on: 
+  pull_request:
+    types: ['opened', 'synchronize']
 
 jobs:
   php-lint:
@@ -24,7 +26,7 @@ jobs:
       - name: Get staged files
         id: staged-files
         run: |
-          git diff --name-only --cached --diff-filter=d -- '*.php' > staged_files.txt
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- '*.php' > staged_files.txt
 
       - name: Run PHPCS
         run: |
