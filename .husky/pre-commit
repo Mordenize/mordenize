@@ -18,6 +18,3 @@ if [[ $PRE_COMMIT_FAILED -eq 1 ]]; then
   echo "❌❌❌ Check failed: One or more checks failed. Please fix the issues. ❌❌❌"
   exit 1
 fi
-
-echo "✅ Check passed: All checks have passed. ✅"
-exit 0

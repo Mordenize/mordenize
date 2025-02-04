@@ -1,4 +1,4 @@
 echo "💡=== Checking Conventional Commit"
 
 # Lint commit messages 
-npx --no-install commitlint --edit $1
+npx --no-install commitlint --edit "$1" && echo "👍 Commit message passed linting! \n ✅ Check passed: All checks have passed. ✅"
