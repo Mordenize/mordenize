@@ -1,3 +1,20 @@
-echo "❗=== Checking ESLint"
-# Check JS, TS format was valid with ESLint rules
-sh .husky/scripts/eslint-checker.sh
+# Run the script with an interactive terminal
+exec < /dev/tty
+
+# Keep color output in a Husky pre-commit hook 
+export FORCE_COLOR=1
+
+echo "💡=== Checking ESLint (.js,.ts,.jsx,.tsx)"
+sh .husky/workflows/eslint-checker.sh || PRE_COMMIT_FAILED=1
+
+echo "💡=== Checking Stylelint (.css,.scss)"
+sh .husky/workflows/stylelint-checker.sh || PRE_COMMIT_FAILED=1
+
+echo "💡=== Checking PHPCS (.php)"
+sh .husky/workflows/phpcs-checker.sh || PRE_COMMIT_FAILED=1
+
+# If any check failed, return a non-zero status (trigger pre-commit failure)
+if [[ $PRE_COMMIT_FAILED -eq 1 ]]; then
+  echo "❌❌❌ Check failed: One or more checks failed. Please fix the issues. ❌❌❌"
+  exit 1
+fi

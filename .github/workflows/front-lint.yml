@@ -22,13 +22,23 @@ jobs:
         run: npm ci # or yarn install
 
       - name: Get JS/TS staged files
-        id: staged-files
         run: |
           git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No JS/TS files staged for checking."
       
       - name: Execute ESLint
         run: |
-          if [ -n "$STAGED_FILES" ]; then
-            npx eslint $STAGED_FILES
+          if [ -s js_staged_files.txt ]; then
+            cat js_staged_files.txt | npx eslint
           fi
+          
+      - name: Get CSS/SCSS staged files
+        run: |
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(css,scss)$' > css_staged_files.txt || echo "No CSS/SCSS files staged for checking."
+      
+      - name: Execute Stylelint
+        run: |
+          if [ -s css_staged_files.txt ]; then
+            cat css_staged_files.txt | npx stylelint
+          fi
+      
 
