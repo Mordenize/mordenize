@@ -10,26 +10,25 @@ fi
 
 # Run check Stylelint rules on staged files
 # 2>&1 redirects STDERR to STDOUT
-STYLELINT_OUTPUT=$(npx stylelint $STAGED_FILES 2>&1 || true)
+npx stylelint $STAGED_FILES 2>&1
 
-if [ -n "$STYLELINT_OUTPUT" ]; then
-  echo "$STYLELINT_OUTPUT"
-  read -p "> Fix issues? (y/n): " CHOICE
+# If have errors 
+if [ $? -ne 0 ]; then
+  read -p "> Run autofix issues? (y/n): " CHOICE
 
   if [ "$CHOICE" = "y" ]; then
     echo "🛠️ Fixing Stylelint issues in staged files..."
-    STYLELINT_FIX_OUTPUT=$(npx stylelint --fix $STAGED_FILES 2>&1 || true)
+    npx stylelint --fix $STAGED_FILES 2>&1
 
-    # Re-add file again if not have error
-    if [ -n "$STYLELINT_FIX_OUTPUT" ]; then
-      echo "❗Stylelint doesn't support autofix rules like 'color-named'..." 
-      echo "❌ Stylelint encountered errors. Please check manually."
-      exit 1
+    # Issues can't be autofixed by ESLint
+    if [[ $? -ne 0 ]]; then
+        echo "❌ Please fix the issues before commit."
+        exit 1
+    else
+        echo "👍 Git add files to Git..."
+        git add $STAGED_FILES
+        echo "📌 Files added successfully."
     fi
-
-    echo "👍 Stylelint fixes applied. Re-adding files to Git..."
-    git add $STAGED_FILES
-    echo "📌 Files re-added successfully."
   else
     echo "❌ Stylelint encountered errors. Please check manually."
     exit 1

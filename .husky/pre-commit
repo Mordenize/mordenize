@@ -15,6 +15,9 @@ sh .husky/workflows/phpcs-checker.sh || PRE_COMMIT_FAILED=1
 
 # If any check failed, return a non-zero status (trigger pre-commit failure)
 if [[ $PRE_COMMIT_FAILED -eq 1 ]]; then
-  echo "❌❌❌ Commit failed: One or more checks failed. Please fix the issues. ❌❌❌"
+  echo "❌❌❌ Check failed: One or more checks failed. Please fix the issues. ❌❌❌"
   exit 1
 fi
+
+echo "✅ Check passed: All checks have passed. ✅"
+exit 0

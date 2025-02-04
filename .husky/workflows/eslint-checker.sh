@@ -9,23 +9,29 @@ if [ -z "$STAGED_FILES" ]; then
 fi
 
 # Run check ESLint rules on staged files
-ESLINT_OUTPUT=$(npx eslint $STAGED_FILES || true)
+npx eslint $STAGED_FILES
 
-if [ -n "$ESLINT_OUTPUT" ]; then
-  echo "$ESLINT_OUTPUT"
-  read -p "> Fix issues? (y/n): " CHOICE
+# If have errors 
+if [ $? -ne 0 ]; then
+  read -p "> Run autofix issues? (y/n): " CHOICE
 
   if [ "$CHOICE" = "y" ]; then
     echo "🛠️ Fixing ESLint issues in staged files..."
     npx eslint --fix $STAGED_FILES
 
-    echo "👍 ESLint fixes applied. Re-adding files to Git..."
-    git add $STAGED_FILES
-    echo "📌 Files re-added successfully."
+    # Issues can't be autofixed by ESLint
+    if [[ $? -ne 0 ]]; then
+        echo "❌ Please fix the issues before commit."
+        exit 1
+    else
+        echo "👍 Git add files to Git..."
+        git add $STAGED_FILES
+        echo "📌 Files added successfully."
+    fi
   else
-    echo "❌ ESLint encountered errors. Please check manually."
+    echo "❌ Please fix the issues before commit."
     exit 1
-  fi
+  fi 
 fi
 
 echo "👍 All the files are valid."

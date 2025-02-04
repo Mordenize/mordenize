@@ -10,33 +10,33 @@ fi
 
 # Config path & command
 VENDOR_BIN_PATH=./vendor/bin
-PHPCS_OUTPUT=$("$VENDOR_BIN_PATH/phpcs" $STAGED_FILES "--standard=./phpcs.xml")
-PHPCS_STATUS=$?
 
-echo "$PHPCS_OUTPUT"
-# If have errors can be autofixed by PHPCBF
-if [ $PHPCS_STATUS -eq 2 ]; then
-  read -p "> Fix issues? (y/n): " CHOICE
+readarray -t FILES <<< "$STAGED_FILES"
+"$VENDOR_BIN_PATH/phpcs" -s --standard=./phpcs.xml "${FILES[@]}"
+
+# If have errors
+if [ $? -ne 0 ]; then
+  read -p "> Run autofix issues? (y/n): " CHOICE
 
   if [ "$CHOICE" = "y" ]; then
     # Run autofix PHP files by PHPCBF
     echo "🛠️ Fixing PHP issues in staged files..."
-    PHPCBF_OUTPUT=$("$VENDOR_BIN_PATH/phpcbf" $STAGED_FILES)
+    "$VENDOR_BIN_PATH/phpcbf" -s --standard=./phpcs.xml "${FILES[@]}" > /dev/null 2>&1
 
-    # Re-check PHPCS status
-    PHPCS_OUTPUT=$("$VENDOR_BIN_PATH/phpcs" $STAGED_FILES "--standard=./phpcs.xml")
+    echo "🛠️ Re-check PHPCS after autofix"
+    "$VENDOR_BIN_PATH/phpcs" -s --standard=./phpcs.xml "${FILES[@]}"
 
-    # if have errors can't autofixed by PHPCBF
-    if [ $? -eq 1 ]; then
-      echo "❗Some errors can't be autofixed by PHPCBF."     
-      echo "$PHPCS_OUTPUT"
+    # after run PHPCBF still have errors can't autofixed
+    if [[ $? -ne 0 ]]; then
+        echo "❌ Please fix the issues before commit."
+        exit 1
+    else
+        echo "👍 Git add files to Git..."
+        git add $STAGED_FILES
+        echo "📌 Files added successfully."
     fi
-
-    echo "👍 PHPCBF fixes applied. Re-adding files to Git..."
-    git add $STAGED_FILES
-    echo "📌 Files re-added successfully."
   else
-    echo "❌ PHPCS encountered errors. Please check manually."
+    echo "❌ Please fix the issues before commit."
     exit 1
   fi
 fi
