@@ -1,0 +1,16 @@
+// invalid.scss
+
+// Missing semicolon, incorrect indentation, and redundant nesting
+$color-primary: blue
+
+.button {
+color:$color-primary
+    padding: 10px 20px;
+    border: none;
+    &:hover {
+      color: red;
+        .nested {
+      font-weight: bold;
+    }
+  }
+}
