@@ -6,12 +6,14 @@ on:
 
 jobs:
   php-lint:
-    name: Check PHPCS
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Fetch latest changes from remote
+        run: git fetch origin
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -21,15 +23,16 @@ jobs:
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
-        working-directory: app
 
       - name: Get PHP staged files
         id: staged-files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- '*.php' > staged_files.txt
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- '*.php' > staged_files.txt || echo "No PHP files staged for checking."
 
       - name: Execute PHPCS
         run: |
           if [ -s staged_files.txt ]; then
-            cat staged_files.txt | xargs vendor/bin/phpcs --standard=PSR12
+            cat staged_files.txt | xargs ./vendor/bin/phpcs --standard=PSR12
+          else 
+            echo "No PHP files staged for checking."
           fi
