@@ -28,8 +28,7 @@ jobs:
       - name: Get PHP staged files
         id: staged-files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- '*.php' \ 
-          > staged_files.txt
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- '*.php' > staged_files.txt || echo "No PHP files staged for checking."
 
       - name: Execute PHPCS
         run: |
