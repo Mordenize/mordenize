@@ -44,5 +44,3 @@ jobs:
           if [ -s css_staged_files.txt ]; then
             cat css_staged_files.txt | npx stylelint
           fi
-      
-
