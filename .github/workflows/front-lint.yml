@@ -25,8 +25,11 @@ jobs:
 
       - name: Get JS/TS staged files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || echo "No JS/TS files staged for checking."
-      
+          git --no-pager diff --name-only --diff-filter=AMCR \
+          origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | \
+          grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt || \
+          echo "No JS/TS files staged for checking."
+          
       - name: Execute ESLint
         run: |
           if [ -s js_staged_files.txt ]; then
