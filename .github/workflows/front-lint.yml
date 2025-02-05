@@ -5,7 +5,7 @@ on:
     types: ['opened', 'synchronize']
 
 jobs: 
-  js-lint:
+  front-lint:
     runs-on: ubuntu-latest
 
     steps:
