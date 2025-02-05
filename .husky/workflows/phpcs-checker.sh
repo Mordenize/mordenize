@@ -11,7 +11,11 @@ fi
 # Config path & command
 VENDOR_BIN_PATH=./vendor/bin
 
-readarray -t FILES <<< "$STAGED_FILES"
+# If your bash version is 3.x, you'll need to update it because readarray doesn't support from this version
+FILES=()
+while IFS= read -r file; do
+  FILES+=("$file")
+done <<< "$STAGED_FILES"
 "$VENDOR_BIN_PATH/phpcs" -s --standard=./phpcs.xml "${FILES[@]}"
 
 # If have errors
