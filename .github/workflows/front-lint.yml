@@ -1,13 +1,12 @@
-name: JS/TS Code Quality Checks
+name: JS/TS/CSS Code Quality Checks
 
 on: 
   pull_request:
     types: ['opened', 'synchronize']
 
 jobs: 
-  js-lint:
-    name: Check ESLint
-    runs-on: ubuntu-latest
+  front-lint:
+   runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -21,9 +20,13 @@ jobs:
       - name: Install dependencies
         run: npm ci # or yarn install
 
+      - name: Fetch remote branches
+        run: git fetch --all
+        
       - name: Get JS/TS staged files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(js|ts|tsx|jsx)$' > js_staged_files.txt
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- | grep -E '\.(js|ts|tsx|jsx)$' \
+          > js_staged_files.txt || echo "No JS/TS files staged for checking."
       
       - name: Execute ESLint
         run: |
@@ -33,7 +36,8 @@ jobs:
           
       - name: Get CSS/SCSS staged files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(css,scss)$' > css_staged_files.txt || echo "No CSS/SCSS files staged for checking."
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} -- | grep -E '\.(css,scss)$' \ 
+          > css_staged_files.txt || echo "No CSS/SCSS files staged for checking."
       
       - name: Execute Stylelint
         run: |
