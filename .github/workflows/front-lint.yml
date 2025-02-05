@@ -20,7 +20,15 @@ jobs:
         with:
           node-version: 22
 
+      - name: Cache node_modules
+        id: cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}
+
       - name: Install dependencies
+        if: steps.cache-node_modules.outputs.cache-hit != 'true' # Skip if cache hit
         run: npm ci # or yarn install
 
       - name: Get JS/TS staged files
