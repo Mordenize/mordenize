@@ -37,7 +37,7 @@ jobs:
 
       - name: Get CSS/SCSS staged files
         run: |
-          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(css,scss)$' > css_staged_files.txt || echo "No CSS/SCSS files staged for checking."
+          git --no-pager diff --name-only --diff-filter=AMCR origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF} | grep -E '\.(css|scss)$' > css_staged_files.txt || echo "No CSS/SCSS files staged for checking."
         if: always()
 
       - name: Execute Stylelint
